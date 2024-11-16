@@ -1,0 +1,56 @@
+# plantonic-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plantonic-backend
+  labels:
+    app: plantonic-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: plantonic-backend
+  template:
+    metadata:
+      labels:
+        app: plantonic-backend
+    spec:
+      containers:
+      - name: plantonic-backend
+        image: monolog343/plantonic-diagonastic:plantonicV0.1
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+    # liveness and readiness probes
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 80
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /n
+        #     port: 80
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 5
+
+---
+# plantonic-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plantonic-backend-service
+spec:
+  selector:
+    app: plantonic-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
